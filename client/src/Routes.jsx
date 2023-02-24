@@ -5,6 +5,10 @@ import {UserContext} from "./UserContext.jsx";
 const Routes = () => {
 const {username, id} = useContext(UserContext);
 
+  if(username){
+    return "Login successfully !!!"
+  }
+
   return (
     <RegisterAndLoginForm />
   )

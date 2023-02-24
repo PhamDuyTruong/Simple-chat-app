@@ -1,6 +1,6 @@
 import React, {useState, useContext} from 'react';
 import axios from 'axios';
-import UserContext from './UserContext'
+import {UserContext} from './UserContext'
 
 const RegisterAndLoginForm = () => {
   const [username, setUsername] = useState('');
@@ -10,7 +10,7 @@ const RegisterAndLoginForm = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    const url = '/register';
+    const url = isLoginOrRegister === 'register' ? '/register' : '/login';
     const formData = {
       username: username,
       password: password
