@@ -43,8 +43,38 @@ app.post("/register", async (req, res) => {
         res.status(500).json('error');
     }
 
+});
 
-})
+app.post("/login", async (req, res) => {
+    const {username, password} = req.body;
+    const foundUser = await User.findOne({username});
+    if(foundUser){
+        const passOk = bcrypt.compareSync(password, foundUser.password);
+        if(passOk){
+            jwt.sign({userId:foundUser._id,username}, jwtSecret, {}, (err, token) => {
+                res.cookie('token', token, {sameSite:'none', secure:true}).json({
+                  id: foundUser._id,
+                });
+              });
+        }
+    }
+});
+
+app.post('/logout', (req,res) => {
+    res.cookie('token', '', {sameSite:'none', secure:true}).json('ok');
+  });
+
+app.get('/profile', (req,res) => {
+    const token = req.cookies?.token;
+    if (token) {
+      jwt.verify(token, jwtSecret, {}, (err, userData) => {
+        if (err) throw err;
+        res.json(userData);
+      });
+    } else {
+      res.status(401).json('no token');
+    }
+});
 
 const PORT = 4000
 mongoose.connect(process.env.MONGO_URL).then(() => {
