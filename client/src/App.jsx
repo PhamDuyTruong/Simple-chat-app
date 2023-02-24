@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
 import './App.css'
+import axios from 'axios'
 import RegisterAndLoginForm from './RegisterAndLoginForm'
 
 function App() {
-
+  axios.defaults.baseURL = "http://localhost:4000"
+  axios.defaults.withCredentials = true;
   return (
     <div className="container">
       <RegisterAndLoginForm />

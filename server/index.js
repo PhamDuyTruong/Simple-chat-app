@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const cookieParser = require('cookie-parser');
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const cors = require("cors")
 const User = require("./models/User");
 
 dotenv.config();
@@ -13,7 +14,11 @@ const bcryptSalt = bcrypt.genSaltSync(10);
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
-
+app.use(cors({
+    credentials: true,
+    origin: process.env.CLIENT_URL,
+  }));
+  
 
 app.get("/test", (req, res) => {
     res.json("test ok")
@@ -42,7 +47,7 @@ app.post("/register", async (req, res) => {
 })
 
 const PORT = 4000
-mongoose.connect(process.env.MONGO_URL, {useNewUrlParser: true, useUnifiedTopology: true}).then(() => {
+mongoose.connect(process.env.MONGO_URL).then(() => {
     console.log('Connected to DB');
     app.listen(PORT, () => {
         console.log(`Server is running at ${PORT}`);

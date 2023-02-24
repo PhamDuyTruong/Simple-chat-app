@@ -1,12 +1,23 @@
-import React, {useState} from 'react'
+import React, {useState} from 'react';
+import axios from 'axios'
 
 const RegisterAndLoginForm = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    const url = '/register';
+    const formData = {
+      username: username,
+      password: password
+    }
+    await axios.post(url, formData);
+  }
+
   return (
     <div className='bg-blue-50 h-screen flex items-center'>
-        <form className='w-64 mx-auto mb-12'>
+        <form className='w-64 mx-auto mb-12' onSubmit={handleRegister}>
             <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder='Username' className='block w-full rounded-sm p-2 mb-2 border'/>
             <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder='password' className='block w-full rounded-sm p-2 mb-2 border'/>
             <button className='bg-blue-500 text-white block w-full rounded-sm p-2'>
@@ -22,7 +33,7 @@ const RegisterAndLoginForm = () => {
               
                 <div>
                  Dont have an account?
-              <button className="ml-1">
+              <button type='button' className="ml-1">
                 Register
               </button>
             </div>
