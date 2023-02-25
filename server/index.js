@@ -4,7 +4,9 @@ const dotenv = require("dotenv");
 const cookieParser = require('cookie-parser');
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const cors = require("cors")
+const cors = require("cors");
+const ws = require('ws');
+const fs = require('fs');
 const User = require("./models/User");
 
 dotenv.config();
@@ -79,9 +81,27 @@ app.get('/profile', (req,res) => {
 const PORT = 4000
 mongoose.connect(process.env.MONGO_URL).then(() => {
     console.log('Connected to DB');
-    app.listen(PORT, () => {
-        console.log(`Server is running at ${PORT}`);
-    })
 }).catch(err=> {
     console.log('Error: ', err)
 });
+
+const server = app.listen(PORT);
+
+const wss = new ws.WebSocketServer({server});
+wss.on('connection', (connection, req) => {
+  const cookies = req.headers.cookie;
+  if(cookies){
+    const tokenCookieString = cookies.split(';').find(str => str.startsWith("token="));
+    if(tokenCookieString){
+      const token = tokenCookieString.split('=')[1];
+      if(token){
+        jwt.verify(token, jwtSecret, {}, (err, userData) => {
+          if (err) throw err;
+          const {userId, username} = userData;
+          connection.userId = userId;
+          connection.username = username;
+        });
+      }
+    }
+  }
+})

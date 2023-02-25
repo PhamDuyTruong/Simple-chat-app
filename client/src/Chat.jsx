@@ -3,7 +3,35 @@ import axios from 'axios'
 import {UserContext} from "./UserContext.jsx";
 
 const Chat = () => {
+    const [ws,setWs] = useState(null);
+    const [onlinePeople,setOnlinePeople] = useState({});
+    const [offlinePeople,setOfflinePeople] = useState({});
+    const [selectedUserId,setSelectedUserId] = useState(null);
+    const [newMessageText,setNewMessageText] = useState('');
+    const [messages,setMessages] = useState([]);
     const {username,id,setId,setUsername} = useContext(UserContext);
+    const connectToWs = () => {
+        const ws = new WebSocket("ws://localhost:4000");
+        setWs(ws);
+        ws.addEventListener('message', handleMessgae)
+        ws.addEventListener('close', () => {
+            setTimeout(() => {
+              console.log('Disconnected. Trying to reconnect.');
+              connectToWs();
+            }, 1000);
+          
+        });
+    };
+
+    useEffect(() => {
+        connectToWs();
+    });
+
+    function handleMessgae(e){
+        
+    }
+
+
     const handleLogout = () => {
         axios.post('/logout').then(() => {
             setId(null);
