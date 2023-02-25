@@ -89,6 +89,15 @@ const server = app.listen(PORT);
 
 const wss = new ws.WebSocketServer({server});
 wss.on('connection', (connection, req) => {
+
+  function notifyAboutOnlinePeople(){
+    [...wss.clients].forEach(client => {
+      client.send(JSON.stringify({
+        online: [...wss.clients].map(c => ({userId:c.userId,username:c.username})),
+      }));
+    })
+  }
+
   const cookies = req.headers.cookie;
   if(cookies){
     const tokenCookieString = cookies.split(';').find(str => str.startsWith("token="));
@@ -104,4 +113,8 @@ wss.on('connection', (connection, req) => {
       }
     }
   }
+
+  
+
+
 })
