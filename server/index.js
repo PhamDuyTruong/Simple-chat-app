@@ -114,7 +114,7 @@ wss.on('connection', (connection, req) => {
     }
   }
 
-  
 
+ notifyAboutOnlinePeople()
 
 })
