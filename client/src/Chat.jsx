@@ -1,6 +1,7 @@
 import React, {useEffect, useState, useRef, useContext} from 'react';
 import axios from 'axios'
 import {UserContext} from "./UserContext.jsx";
+import {uniqBy} from "lodash";
 import Logo from './Logo.jsx';
 import Contact from './Contact'
 
@@ -12,6 +13,7 @@ const Chat = () => {
     const [newMessageText,setNewMessageText] = useState('');
     const [messages,setMessages] = useState([]);
     const {username,id,setId,setUsername} = useContext(UserContext);
+    const underMessage = useRef();
     const connectToWs = () => {
         const ws = new WebSocket("ws://localhost:4000");
         setWs(ws);
@@ -28,6 +30,14 @@ const Chat = () => {
     useEffect(() => {
         connectToWs();
     }, [selectedUserId]);
+
+    useEffect(() => {
+      const div = underMessage.current;
+      if (div) {
+        div.scrollIntoView({behavior:'smooth', block:'end'});
+      }
+    }, [messages]);
+  
 
     
     function showOnlinePeople(peopleArr){
@@ -75,6 +85,8 @@ const Chat = () => {
 
     const onlinePeopleExclOurUser = {...onlinePeople};
 
+    const messagesWithoutDupes = uniqBy(messages, '_id');
+
   return (
     <div className='flex h-screen'>
         <div className='bg-white w-1/3 flex flex-col'>
@@ -113,6 +125,26 @@ const Chat = () => {
                     <div className="text-gray-300">&larr; Select a person from the sidebar</div>
                 </div>
                 )}
+
+        {!!selectedUserId && (
+            <div className="relative h-full">
+              <div className="overflow-y-scroll absolute top-0 left-0 right-0 bottom-2">
+                {messagesWithoutDupes.map(message => (
+                  <div key={message._id} className={(message.sender === id ? 'text-right': 'text-left')}>
+                    <div className={"text-left inline-block p-2 my-2 rounded-md text-sm " +(message.sender === id ? 'bg-blue-500 text-white':'bg-white text-gray-500')}>
+                      {message.text}
+                      {message.file && (
+                        <div className="">
+                          
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+                <div ref={underMessage}></div>
+              </div>
+            </div>
+          )}
             </div>
 
             {!!selectedUserId && (
