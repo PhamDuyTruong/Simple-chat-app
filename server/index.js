@@ -8,6 +8,7 @@ const cors = require("cors");
 const ws = require('ws');
 const fs = require('fs');
 const User = require("./models/User");
+const Message = require("./models/Message")
 
 dotenv.config();
 const jwtSecret = process.env.MY_SECRETKEY;
@@ -113,6 +114,26 @@ wss.on('connection', (connection, req) => {
       }
     }
   }
+
+  connection.on("message", async(message) => {
+    const messageData = JSON.parse(message.toString());
+    const {recipient, text} = messageData;
+    if(recipient && text){
+      const messageDoc = await Message.create({
+        sender: connection.userId,
+        recipient,
+        text,
+        file: file ? filename : null,
+      });
+      [...wss.clients].filter(c => c.userId === recipient).forEach(c => c.send(JSON.stringify({
+        text,
+        sender: connection.userId,
+        recipient,
+        file: file ? filename : null,
+        _id: messageDoc._id
+      })))
+    }
+  })
 
 
  notifyAboutOnlinePeople()

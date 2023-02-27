@@ -42,7 +42,11 @@ const Chat = () => {
         const messageData = JSON.parse(e.data);
         if('online' in messageData){
             showOnlinePeople(messageData.online)
-        }
+        }else if ('text' in messageData) {
+            if (messageData.sender === selectedUserId) {
+              setMessages(prev => ([...prev, {...messageData}]));
+            }
+          }
     }
 
     function sendMessage(e, file = null){
@@ -51,6 +55,13 @@ const Chat = () => {
           recipient: selectedUserId,
           text: newMessageText,
         }));
+        setNewMessageText('');
+        setMessages(prev => ([...prev,{
+          text: newMessageText,
+          sender: id,
+          recipient: selectedUserId,
+          _id: Date.now(),
+        }]));
     }
 
 
