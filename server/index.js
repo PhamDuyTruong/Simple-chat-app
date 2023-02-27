@@ -102,6 +102,11 @@ app.get("/messages/:userId", async (req, res) => {
     recipient:{$in:[userId,ourUserId]},
   }).sort({createdAt: 1});
   res.json(messages);  
+});
+
+app.get("/people", async (req, res) => {
+  const users = await User.find({}, {'_id':1,username:1});
+  res.json(users);
 })
 
 const PORT = 4000
